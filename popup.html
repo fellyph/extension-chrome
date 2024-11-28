@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Text Improver</title>
+  <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+  <div class="container">
+    <h2>Text Improver</h2>
+    <div class="input-section">
+      <textarea id="textInput" placeholder="Enter your text here..."></textarea>
+      <button id="improveBtn">Improve Text</button>
+    </div>
+    <div class="suggestions-section">
+      <h3>Suggestions:</h3>
+      <ul id="suggestionsList"></ul>
+    </div>
+  </div>
+  <script src="utils/textAnalyzer.js"></script>
+  <script src="utils/suggestionGenerator.js"></script>
+  <script src="popup.js"></script>
+</body>
+</html>
