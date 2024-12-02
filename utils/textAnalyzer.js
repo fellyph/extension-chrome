@@ -1,69 +1,46 @@
 export class TextAnalyzer {
-  static analyzeGrammar(text) {
-    const issues = [];
-    
-    // Common grammar rules
-    const rules = [
-      {
-        pattern: /\b(its|it's)\b/g,
-        check: (match, context) => {
-          // Check for incorrect its/it's usage
-          const isContraction = context.includes("it is") || context.includes("it has");
-          if ((match === "its" && isContraction) || (match === "it's" && !isContraction)) {
-            return `Consider using '${match === "its" ? "it's" : "its"}' instead`;
-          }
-        }
-      },
-      {
-        pattern: /\b(there|their|they're)\b/g,
-        check: (match, context) => {
-          // Basic there/their/they're check
-          return "Verify correct usage of there/their/they're";
-        }
-      },
-      {
-        pattern: /\s+,/g,
-        check: () => "Remove space before comma"
-      }
-    ];
+  static async createAISession() {
+    // Check if AI capabilities are available
+    const capabilities = await chrome.aiOriginTrial.languageModel.capabilities();
 
-    rules.forEach(rule => {
-      let match;
-      while ((match = rule.pattern.exec(text)) !== null) {
-        const suggestion = rule.check(match[0], text);
-        if (suggestion) {
-          issues.push({
-            original: match[0],
-            position: match.index,
-            suggestion
+    if (!capabilities?.available) {
+      console.warn('AI analysis not available');
+    }
+    if (capabilities.available === 'no') {
+      const session = await chrome.aiOriginTrial.languageModel.create({
+        monitor(m) {
+          m.addEventListener("downloadprogress", (e) => {
+            console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
           });
-        }
-      }
-    });
+        },
+      });
+    }
 
-    return issues;
+    // Create an AI session with appropriate system prompt
+    return await chrome.aiOriginTrial.languageModel.create({
+      systemPrompt: `You are a highly sensitive data detection AI. Your primary goal is to identify and categorize sensitive information with high accuracy and minimal false positives. Prioritize user privacy and data security. Always err on the side of caution when identifying potentially sensitive data, even if it means occasionally flagging something that is not truly sensitive.`,
+      temperature: 0.5,
+      topK: capabilities.defaultTopK,
+    });
   }
 
-  static checkSpelling(text) {
-    // Basic spelling checks (simplified version)
-    const commonMisspellings = {
-      'recieve': 'receive',
-      'seperate': 'separate',
-      'occured': 'occurred',
-      'definately': 'definitely'
-    };
-
-    const issues = [];
-    text.split(/\s+/).forEach(word => {
-      const correction = commonMisspellings[word.toLowerCase()];
-      if (correction) {
-        issues.push({
-          original: word,
-          suggestion: `Consider using '${correction}' instead of '${word}'`
-        });
+  static async analyzeText(text) {
+    try {
+      const session = await this.createAISession();
+      if (!session) {
+        console.warn('AI analysis not available');
       }
-    });
 
-    return issues;
+      const result = await session.prompt(`Analyze the following text for sensitive information, including:
+        Credit card numbers
+        Social Security numbers (SSNs)
+        Email addresses
+        Phone numbers
+        Full names
+        Highlight any sensitive data found and categorize each instance by its type (e.g., 'credit card', 'SSN', etc.): "${text}"`);
+      return result;
+    } catch (error) {
+      console.warn('AI analysis failed, falling back to basic checks:', error);
+    }
   }
 }
