@@ -10,7 +10,9 @@
     "aiLanguageModelOriginTrial",
     "storage",
     "activeTab",
-    "scripting"
+    "scripting",
+    "contextMenus",
+    "windows"
   ],
   "trial_tokens": [
     "ArGHu3QNRHbIsjlYL5CX7Oa8vTQUUHi6OLAfrz7oULof5jFPQNGNYxI2IXlUXsYHzMLedEsczTx5Jp/W3vPusA4AAAB4eyJvcmlnaW4iOiJjaHJvbWUtZXh0ZW5zaW9uOi8vamJvamdib25wb2Zwam9ubWplcGxuZGNsbm9pZGxpb24iLCJmZWF0dXJlIjoiQUlQcm9tcHRBUElGb3JFeHRlbnNpb24iLCJleHBpcnkiOjE3NjA0ODYzOTl9"

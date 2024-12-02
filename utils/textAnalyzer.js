@@ -31,20 +31,25 @@ export class TextAnalyzer {
         console.warn('AI analysis not available');
       }
 
-      const result = await session.prompt(`**Task:** Analyze the following text for sensitive information and assign a risk score.
+      const result = await session.prompt(`## Analyze Text for Sensitive Data
 
-**Risk Scoring:**
+**Task:** Analyze the following text to determine if it contains sensitive information.
 
-*   Green (Low Risk):** No sensitive data found.
-*   Yellow (Medium Risk):**  Some potentially identifying data found (e.g., company name, first name, website URL).
-*   Red (High Risk):** Sensitive information found (e.g., credit card numbers, Social Security numbers (SSNs), email addresses, phone numbers, full names,  dates of birth, medical information, driver's license numbers, passport numbers, bank account numbers, etc.).
+**Sensitive Information:**
+
+Sensitive information includes, but is not limited to:
+
+*   **Personally Identifiable Information (PII):**  Full names, email addresses, phone numbers,  dates of birth, Social Security numbers (SSNs), driver's license numbers, passport numbers, etc.
+*   **Financial Information:** Credit card numbers, bank account numbers, etc.
+*   **Health Information:** Medical records, diagnoses, treatments, etc.
 
 **Output:**
 
+1.  **Sensitive Data Detected:** Indicate with a clear "Yes" or "No" whether sensitive information was found in the text.
+2.  **Highlighted Data:** Highlight all sensitive data found in the text.
+3.  **Categorization:** Categorize each instance of highlighted data by its type (e.g., "credit card," "SSN," "email address," "full name," etc.). 
 
-1.  **Highlighted Data:** Highlight all sensitive or potentially identifying data found in the text.
-2.  **Categorization:** Categorize each instance of highlighted data by its type (e.g., "credit card," "SSN," "email address," "full name," "company name," etc.).
-3.  [Risk Score=Assign a risk score (Green, Yellow, or Red) based on the detected information]
+[text]
  "${text}"`);
       return result;
     } catch (error) {

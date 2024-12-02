@@ -7,7 +7,13 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'popup.html'),
+        background: resolve(__dirname, 'background.js')
       },
+      output: {
+        entryFileNames: '[name].js',
+        chunkFileNames: '[name].[hash].js',
+        assetFileNames: '[name].[ext]'
+      }
     },
     outDir: 'dist',
   },

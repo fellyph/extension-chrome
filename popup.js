@@ -6,14 +6,47 @@ marked.setOptions({
   sanitize: true  // Prevents XSS attacks
 });
 
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', async () => {
   const textInput = document.getElementById('textInput');
   const improveBtn = document.getElementById('improveBtn');
   const suggestionsList = document.getElementById('suggestionsList');
+  const spinner = document.getElementById('spinner');
+  const analysisSection = document.getElementById('analysisSection');
 
-  improveBtn.addEventListener('click', async () => {
+  // Add close button handler
+  const closeBtn = document.createElement('button');
+  closeBtn.textContent = '✕';
+  closeBtn.className = 'absolute top-2 right-2 text-gray-500 hover:text-gray-700';
+  closeBtn.addEventListener('click', () => {
+    window.close();
+  });
+  document.body.appendChild(closeBtn);
+
+  // Check for selected text from context menu
+  const { selectedText } = await chrome.storage.local.get('selectedText');
+  if (selectedText) {
+    textInput.value = selectedText;
+    // Clear the stored text
+    await chrome.storage.local.remove('selectedText');
+    // Automatically trigger analysis
+    analyzeText(selectedText);
+  }
+
+  improveBtn.addEventListener('click', () => {
+    const text = textInput.value;
+    analyzeText(text);
+  });
+
+  async function analyzeText(text) {
     try {
-      const text = textInput.value;
+      // Clear previous results and hide analysis section
+      suggestionsList.innerHTML = '';
+      analysisSection.classList.add('hidden');
+      
+      // Disable button and show spinner
+      improveBtn.disabled = true;
+      spinner.classList.remove('hidden');
+
       const response = await SuggestionGenerator.generate(text);
       
       // Extract Risk Score
@@ -32,11 +65,19 @@ document.addEventListener('DOMContentLoaded', () => {
       const html = marked(cleanResponse);
       suggestionsList.innerHTML = html;
       
+      // Show analysis section after content is loaded
+      analysisSection.classList.remove('hidden');
+      
     } catch (error) {
       console.error('Error processing suggestions:', error);
       suggestionsList.innerHTML = '<div class="p-2 text-red-600">Error processing text. Please try again.</div>';
+      analysisSection.classList.remove('hidden');
+    } finally {
+      // Re-enable button and hide spinner
+      improveBtn.disabled = false;
+      spinner.classList.add('hidden');
     }
-  });
+  }
 
   async function updateBadge(riskScore) {
     // Get color based on risk score
