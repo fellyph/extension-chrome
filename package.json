@@ -5,10 +5,13 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
-    "preview": "vite preview"
+    "build": "npm run generate-icons && vite build",
+    "preview": "vite preview",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "devDependencies": {
-    "vite": "^5.4.2"
+    "vite": "^5.4.2",
+    "fs-extra": "^11.1.1",
+    "canvas": "^2.11.2"
   }
 }
