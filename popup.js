@@ -5,18 +5,23 @@ document.addEventListener('DOMContentLoaded', () => {
   const improveBtn = document.getElementById('improveBtn');
   const suggestionsList = document.getElementById('suggestionsList');
 
-  improveBtn.addEventListener('click', () => {
+  improveBtn.addEventListener('click', async () => {
     const text = textInput.value;
-    const suggestions = SuggestionGenerator.generate(text);
     
-    // Clear previous suggestions
-    suggestionsList.innerHTML = '';
-    
-    // Display new suggestions
-    suggestions.forEach(suggestion => {
+    try {
+      // Now awaiting the async generate method
+      const suggestions = await SuggestionGenerator.generate(text);
+      
+      // Clear previous suggestions
+      suggestionsList.innerHTML = '';
       const li = document.createElement('li');
-      li.textContent = suggestion.suggestion;
+      li.textContent = suggestions.result;
       suggestionsList.appendChild(li);
-    });
+
+    } catch (error) {
+      console.error('Error processing suggestions:', error);
+      // Optionally display error to user
+      suggestionsList.innerHTML = '<li class="error">Error processing text. Please try again.</li>';
+    }
   });
 });
