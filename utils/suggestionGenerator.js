@@ -6,10 +6,9 @@ export class SuggestionGenerator {
     
     try {
       // Get grammar issues (now awaiting the async call)
-      const grammarIssues = await TextAnalyzer.analyzeText(text);
-      result = grammarIssues;
-      console.log(result);
-      return suggestions;
+      const textAnalyses = await TextAnalyzer.analyzeText(text);
+      console.log(textAnalyses);
+      return textAnalyses;
     } catch (error) {
       console.error('Error generating suggestions:', error);
       return [];
