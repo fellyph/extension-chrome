@@ -31,13 +31,21 @@ export class TextAnalyzer {
         console.warn('AI analysis not available');
       }
 
-      const result = await session.prompt(`Analyze the following text for sensitive information, including:
-        Credit card numbers
-        Social Security numbers (SSNs)
-        Email addresses
-        Phone numbers
-        Full names
-        Highlight any sensitive data found and categorize each instance by its type (e.g., 'credit card', 'SSN', etc.): "${text}"`);
+      const result = await session.prompt(`**Task:** Analyze the following text for sensitive information and assign a risk score.
+
+**Risk Scoring:**
+
+*   Green (Low Risk):** No sensitive data found.
+*   Yellow (Medium Risk):**  Some potentially identifying data found (e.g., company name, first name, website URL).
+*   Red (High Risk):** Sensitive information found (e.g., credit card numbers, Social Security numbers (SSNs), email addresses, phone numbers, full names,  dates of birth, medical information, driver's license numbers, passport numbers, bank account numbers, etc.).
+
+**Output:**
+
+
+1.  **Highlighted Data:** Highlight all sensitive or potentially identifying data found in the text.
+2.  **Categorization:** Categorize each instance of highlighted data by its type (e.g., "credit card," "SSN," "email address," "full name," "company name," etc.).
+3.  [Risk Score=Assign a risk score (Green, Yellow, or Red) based on the detected information]
+ "${text}"`);
       return result;
     } catch (error) {
       console.warn('AI analysis failed, falling back to basic checks:', error);
