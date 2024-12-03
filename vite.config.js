@@ -30,19 +30,10 @@ export default defineConfig({
         // Copy manifest.json
         await fs.copy('manifest.json', 'dist/manifest.json');
         
-        // Ensure icons directory exists in dist
-        await fs.ensureDir('dist/icons');
-        
-        // Copy icons
-        const iconSizes = [16, 48, 128];
-        for (const size of iconSizes) {
-          await fs.copy(
-            `public/icons/icon${size}.png`,
-            `dist/icons/icon${size}.png`
-          ).catch(err => {
-            console.warn(`Warning: icon${size}.png not found`);
-          });
-        }
+        // Copy icons directory
+        await fs.copy('public/icons', 'dist/icons').catch(err => {
+          console.error('Error copying icons:', err);
+        });
         
         // Copy utils directory
         await fs.copy('utils', 'dist/utils').catch(err => {
