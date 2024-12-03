@@ -7,20 +7,20 @@ export default defineConfig({
     rollupOptions: {
       input: {
         popup: resolve(__dirname, 'popup.html'),
-        background: resolve(__dirname, 'background.js')
+        background: resolve(__dirname, 'background.js'),
       },
       output: {
         entryFileNames: '[name].js',
         chunkFileNames: '[name].[hash].js',
-        assetFileNames: '[name].[ext]'
-      }
+        assetFileNames: '[name].[ext]',
+      },
     },
     outDir: 'dist',
   },
   server: {
     port: 5173,
     open: '/popup.html',
-    cors: true
+    cors: true,
   },
   base: '',
   plugins: [
@@ -29,17 +29,17 @@ export default defineConfig({
       writeBundle: async () => {
         // Copy manifest.json
         await fs.copy('manifest.json', 'dist/manifest.json');
-        
+
         // Copy icons directory
-        await fs.copy('public/icons', 'dist/icons').catch(err => {
+        await fs.copy('public/icons', 'dist/icons').catch((err) => {
           console.error('Error copying icons:', err);
         });
-        
+
         // Copy utils directory
-        await fs.copy('utils', 'dist/utils').catch(err => {
+        await fs.copy('utils', 'dist/utils').catch((err) => {
           console.error('Error copying utils:', err);
         });
       },
     },
   ],
-}); 
+});

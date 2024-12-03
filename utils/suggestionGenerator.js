@@ -2,8 +2,8 @@ import { TextAnalyzer } from './textAnalyzer.js';
 
 export class SuggestionGenerator {
   static async generate(text) {
-    let result = "";
-    
+    let result = '';
+
     try {
       // Get grammar issues (now awaiting the async call)
       const textAnalyses = await TextAnalyzer.analyzeText(text);
