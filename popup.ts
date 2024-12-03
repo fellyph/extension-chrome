@@ -1,5 +1,27 @@
-import { SuggestionGenerator } from './utils/suggestionGenerator.js';
+import { SuggestionGenerator } from './utils/suggestionGenerator';
 import { marked } from 'marked';
+
+// Type definitions
+type RiskScore = 'red' | 'yellow' | 'green';
+
+interface BadgeColors {
+  [key: string]: string;
+  red: string;
+  yellow: string;
+  green: string;
+}
+
+interface StorageData {
+  selectedText?: string;
+}
+
+interface UpdateBadgeMessage {
+  type: 'UPDATE_BADGE';
+  payload: {
+    color: string;
+    text: string;
+  };
+}
 
 // Configure marked for security
 marked.setOptions({
@@ -7,12 +29,13 @@ marked.setOptions({
 });
 
 document.addEventListener('DOMContentLoaded', async () => {
-  const textInput = document.getElementById('textInput');
-  const improveBtn = document.getElementById('improveBtn');
-  const suggestionsList = document.getElementById('suggestionsList');
-  const spinner = document.getElementById('spinner');
-  const analysisSection = document.getElementById('analysisSection');
-  const header = document.querySelector('.app-header');
+  // DOM element references with type assertions
+  const textInput = document.getElementById('textInput') as HTMLTextAreaElement;
+  const improveBtn = document.getElementById('improveBtn') as HTMLButtonElement;
+  const suggestionsList = document.getElementById('suggestionsList') as HTMLDivElement;
+  const spinner = document.getElementById('spinner') as HTMLDivElement;
+  const analysisSection = document.getElementById('analysisSection') as HTMLElement;
+  const header = document.querySelector('.app-header') as HTMLElement;
 
   // Add close button handler
   const closeBtn = document.createElement('button');
@@ -24,13 +47,13 @@ document.addEventListener('DOMContentLoaded', async () => {
   header.appendChild(closeBtn);
 
   // Check for selected text from context menu
-  const { selectedText } = await chrome.storage.local.get('selectedText');
+  const { selectedText } = await chrome.storage.local.get('selectedText') as StorageData;
   if (selectedText) {
     textInput.value = selectedText;
     // Clear the stored text
     await chrome.storage.local.remove('selectedText');
     // Automatically trigger analysis
-    analyzeText(selectedText);
+    await analyzeText(selectedText);
   }
 
   improveBtn.addEventListener('click', () => {
@@ -38,7 +61,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     analyzeText(text);
   });
 
-  async function analyzeText(text) {
+  async function analyzeText(text: string) {
     try {
       // Clear previous results and hide analysis section
       suggestionsList.innerHTML = '';
@@ -80,9 +103,9 @@ document.addEventListener('DOMContentLoaded', async () => {
     }
   }
 
-  async function updateBadge(riskScore) {
+  async function updateBadge(riskScore: RiskScore) {
     // Get color based on risk score
-    const badgeColors = {
+    const badgeColors: BadgeColors = {
       red: '#ef4444', // Tailwind red-500
       yellow: '#eab308', // Tailwind yellow-500
       green: '#22c55e', // Tailwind green-500
@@ -95,6 +118,6 @@ document.addEventListener('DOMContentLoaded', async () => {
         color: badgeColors[riskScore],
         text: riskScore[0].toUpperCase(), // First letter: R, Y, or G
       },
-    });
+    } as UpdateBadgeMessage);
   }
 });
