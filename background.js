@@ -24,15 +24,20 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
     // Update badge to indicate processing
     chrome.action.setBadgeText({ text: '...' });
     
-    // Open the popup
-    chrome.windows.create({
-      url: 'popup.html',
-      type: 'popup',
-      width: 450,
-      height: 600,
-      top: 100,
-      left: 100
-    });
+    // Try to open popup, fall back to creating window if not supported
+    try {
+      await chrome.action.openPopup();
+    } catch (error) {
+      // Fallback for browsers that don't support openPopup
+      chrome.windows.create({
+        url: 'popup.html',
+        type: 'popup',
+        width: 450,
+        height: 600,
+        top: 100,
+        left: 100
+      });
+    }
   }
 });
 
