@@ -9,7 +9,7 @@ chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: 'analyzeSensitiveData',
     title: 'Analyze for Sensitive Data',
-    contexts: ['selection']
+    contexts: ['selection'],
   });
 });
 
@@ -17,13 +17,13 @@ chrome.runtime.onInstalled.addListener(() => {
 chrome.contextMenus.onClicked.addListener(async (info, tab) => {
   if (info.menuItemId === 'analyzeSensitiveData') {
     const selectedText = info.selectionText;
-    
+
     // Store the selected text temporarily
     await chrome.storage.local.set({ selectedText: selectedText });
-    
+
     // Update badge to indicate processing
     chrome.action.setBadgeText({ text: '...' });
-    
+
     // Try to open popup, fall back to creating window if not supported
     try {
       await chrome.action.openPopup();
@@ -35,7 +35,7 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
         width: 450,
         height: 600,
         top: 100,
-        left: 100
+        left: 100,
       });
     }
   }
