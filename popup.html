@@ -1,26 +1,24 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <title>Sensitive Data Analyzer</title>
     <link rel="stylesheet" href="./style.css" />
   </head>
-  <body class="w-[400px] p-4 font-sans relative">
+  <body class="relative w-[400px] p-4 font-sans">
     <div class="flex flex-col gap-4">
-      <div
-        class="bg-green-500 -m-4 mb-4 p-4 flex items-center gap-3 text-white"
-      >
-        <img src="icons/icon48.png" alt="Logo" class="w-4 h-4" />
+      <header class="app-header -m-4 mb-4 flex items-center gap-3 bg-green-500 p-4 text-white">
+        <img src="icons/icon48.png" alt="Logo" class="h-4 w-4" />
         <h2 class="text-base font-semibold">Sensitive Data Analyzer</h2>
-      </div>
+      </header>
       <div class="flex flex-col gap-2.5">
         <textarea
           id="textInput"
           placeholder="Enter your text here..."
-          class="w-full h-[100px] p-2 border border-gray-300 rounded resize-y"
+          class="h-[100px] w-full resize-y rounded border border-gray-300 p-2"
         ></textarea>
         <button
           id="improveBtn"
-          class="bg-green-500 hover:bg-green-600 text-white px-4 py-2 rounded cursor-pointer"
+          class="cursor-pointer rounded bg-green-500 px-4 py-2 text-white hover:bg-green-600"
         >
           Analyze Text
         </button>
@@ -28,10 +26,7 @@
       </div>
       <div id="analysisSection" class="mt-2.5 hidden">
         <h3>Analysis:</h3>
-        <div
-          id="suggestionsList"
-          class="markdown-content prose prose-sm max-w-none"
-        ></div>
+        <div id="suggestionsList" class="markdown-content prose prose-sm max-w-none"></div>
       </div>
     </div>
     <script type="module" src="./popup.js"></script>
