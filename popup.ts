@@ -36,18 +36,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   const spinner = document.getElementById('spinner') as HTMLDivElement;
   const analysisSection = document.getElementById('analysisSection') as HTMLElement;
   const header = document.querySelector('.app-header') as HTMLElement;
+  const closeBtn = document.getElementById('closeBtn') as HTMLButtonElement;
 
   // Add close button handler
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = '✕';
-  closeBtn.className = 'absolute top-2 right-2 text-gray-500 hover:text-gray-700';
   closeBtn.addEventListener('click', () => {
     window.close();
   });
-  header.appendChild(closeBtn);
 
   // Check for selected text from context menu
-  const { selectedText } = await chrome.storage.local.get('selectedText') as StorageData;
+  const { selectedText } = (await chrome.storage.local.get('selectedText')) as StorageData;
   if (selectedText) {
     textInput.value = selectedText;
     // Clear the stored text
