@@ -9,6 +9,9 @@
       <header class="app-header -m-4 mb-4 flex items-center gap-3 bg-green-500 p-4 text-white">
         <img src="icons/icon48.png" alt="Logo" class="h-4 w-4" />
         <h2 class="text-base font-semibold">Sensitive Data Analyzer</h2>
+        <button id="closeBtn" class="absolute right-2 top-2 text-gray-500 hover:text-gray-700">
+          ✕
+        </button>
       </header>
       <div class="flex flex-col gap-2.5">
         <textarea
@@ -29,6 +32,6 @@
         <div id="suggestionsList" class="markdown-content prose prose-sm max-w-none"></div>
       </div>
     </div>
-    <script type="module" src="./popup.js"></script>
+    <script type="module" src="./popup.ts"></script>
   </body>
 </html>
