@@ -1,27 +1,10 @@
 import { SuggestionGenerator } from './utils/suggestionGenerator';
 import { marked } from 'marked';
+import type { BadgeColors } from './types/BadgeColors';
+import type { UpdateBadgeMessage } from './types/UpdateBadgeMessage';
 
 // Type definitions
 type RiskScore = 'red' | 'yellow' | 'green';
-
-interface BadgeColors {
-  [key: string]: string;
-  red: string;
-  yellow: string;
-  green: string;
-}
-
-interface StorageData {
-  selectedText?: string;
-}
-
-interface UpdateBadgeMessage {
-  type: 'UPDATE_BADGE';
-  payload: {
-    color: string;
-    text: string;
-  };
-}
 
 // Configure marked for security
 marked.setOptions({
@@ -58,44 +41,86 @@ document.addEventListener('DOMContentLoaded', async () => {
     analyzeText(text);
   });
 
-  async function analyzeText(text: string) {
+  async function analyzeText(text: string): Promise<void> {
     try {
       // Clear previous results and hide analysis section
       suggestionsList.innerHTML = '';
       analysisSection.classList.add('hidden');
 
-      // Disable button and show spinner
+      // Update button to loading state
       improveBtn.disabled = true;
+      improveBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
+      improveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
       spinner.classList.remove('hidden');
 
-      const response = await SuggestionGenerator.generate(text);
+      const result = await SuggestionGenerator.generate(text);
 
-      // Extract Risk Score
-      const riskScoreMatch = response.match(/Risk Score=(Red|Yellow|Green)/i);
-      const riskScore = riskScoreMatch ? riskScoreMatch[1].toLowerCase() : null;
-
-      // Remove the Risk Score line from the response
-      const cleanResponse = response.replace(/Risk Score=(?:Red|Yellow|Green)\n?/i, '');
-
-      // Update badge
-      if (riskScore) {
-        await updateBadge(riskScore);
+      if (!result) {
+        throw new Error('Failed to generate analysis');
       }
 
-      // Render markdown without the risk score line
-      const html = marked(cleanResponse);
-      suggestionsList.innerHTML = html;
+      // Update badge based on score
+      await updateBadge(result.score.level.toLowerCase() as RiskScore);
 
-      // Show analysis section after content is loaded
+      // Generate HTML for the analysis
+      const analysisHtml = `
+        <div class="mb-4">
+          <div class="flex items-center gap-2 mb-2">
+            <span class="font-semibold">Risk Level:</span>
+            <span class="px-2 py-1 rounded text-sm text-white bg-${result.score.level.toLowerCase()}-500">
+              ${result.score.level}
+            </span>
+          </div>
+          <p class="text-gray-600 text-sm">${result.score.description}</p>
+        </div>
+        
+        ${
+          result.analysis.hasSensitiveData
+            ? `
+          <div class="mt-4">
+            <h4 class="font-semibold mb-2">Detected Sensitive Data:</h4>
+            <ul class="list-disc pl-4">
+              ${result.analysis.highlightedData
+                .map(
+                  (item) => `
+                <li class="mb-1">
+                  <span class="font-medium">${item.category}:</span>
+                  <span class="text-red-600">${item.data}</span>
+                </li>
+              `
+                )
+                .join('')}
+            </ul>
+          </div>
+        `
+            : `
+          <div class="mt-4 p-3 bg-green-50 text-green-800 rounded">
+            No sensitive data detected in the provided text.
+          </div>
+        `
+        }
+        
+        <div class="mt-4">
+          <h4 class="font-semibold mb-2">Full Analysis:</h4>
+          ${marked(result.analysis.rawText)}
+        </div>
+      `;
+
+      suggestionsList.innerHTML = analysisHtml;
       analysisSection.classList.remove('hidden');
     } catch (error) {
       console.error('Error processing suggestions:', error);
-      suggestionsList.innerHTML =
-        '<div class="p-2 text-red-600">Error processing text. Please try again.</div>';
+      suggestionsList.innerHTML = `
+        <div class="p-3 bg-red-50 text-red-600 rounded">
+          Error processing text. Please try again.
+        </div>
+      `;
       analysisSection.classList.remove('hidden');
     } finally {
-      // Re-enable button and hide spinner
+      // Restore button to active state
       improveBtn.disabled = false;
+      improveBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
+      improveBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
       spinner.classList.add('hidden');
     }
   }

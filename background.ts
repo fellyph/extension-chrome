@@ -1,20 +1,5 @@
-// Type definitions for Chrome API
-interface BadgeDetails {
-  text: string;
-  color?: string;
-}
-
-interface UpdateBadgeMessage {
-  type: 'UPDATE_BADGE';
-  payload: {
-    color: string;
-    text: string;
-  };
-}
-
-interface StorageData {
-  selectedText?: string;
-}
+import type { UpdateBadgeMessage } from './types/UpdateBadgeMessage';
+import type { StorageData } from './types/StorageData';
 
 // Type guard for message type
 function isUpdateBadgeMessage(message: any): message is UpdateBadgeMessage {
