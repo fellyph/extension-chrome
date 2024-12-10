@@ -3,4 +3,5 @@ export interface BadgeColors {
   red: string;
   yellow: string;
   green: string;
+  black: string;
 }

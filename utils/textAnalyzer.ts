@@ -80,13 +80,9 @@ export class TextAnalyzer {
         return undefined;
       }
 
-      return await session.prompt(`## Analyze Text for Sensitive Data
+      return await session.prompt(`Analyze the following text to determine if it contains sensitive information.
 
-**Task:** Analyze the following text to determine if it contains sensitive information.
-
-**Sensitive Information:**
-
-Sensitive information includes, but is not limited to:
+Sensitive information includes:
 
 *   **Personally Identifiable Information (PII):**  Full names, email addresses, phone numbers,  dates of birth, Social Security numbers (SSNs), driver's license numbers, passport numbers, etc.
 *   **Financial Information:** Credit card numbers, bank account numbers, etc.
@@ -116,13 +112,14 @@ Text:
 
       return await session.prompt(`Classify the following text based on its sensitivity level:
 
-    Green: No sensitive data.
-    Yellow: Data that can be used to identify a user.
-    Red: Contains sensitive data (PII, financial, health, etc.).
+*   Green: Public - Information that can be openly shared without any adverse consequences.
+*   Yellow: Internal - Data intended for use within the organization but poses no severe risk if disclosed.
+*   Red: Confidential - Information that carries a risk of harm if disclosed and should only be shared with specific individuals.
+*   Black: Restricted - Highly sensitive information, requiring the strictest controls. Unauthorized disclosure could lead to significant damage.
 
-    Respond with only the color classification (Green, Yellow, or Red).
+Respond with only the color classification (Green, Yellow, Red, or Black).
 
-  Text:
+Text:
   "${text}"`);
     } catch (error) {
       console.warn('AI analysis failed, falling back to basic checks:', error);

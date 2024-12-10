@@ -4,7 +4,7 @@ import type { BadgeColors } from './types/BadgeColors';
 import type { UpdateBadgeMessage } from './types/UpdateBadgeMessage';
 
 // Type definitions
-type RiskScore = 'red' | 'yellow' | 'green';
+type RiskScore = 'red' | 'yellow' | 'green' | 'black';
 
 // Configure marked for security
 marked.setOptions({
@@ -49,8 +49,6 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Update button to loading state
       improveBtn.disabled = true;
-      improveBtn.classList.add('bg-gray-300', 'cursor-not-allowed');
-      improveBtn.classList.remove('bg-emerald-600', 'hover:bg-emerald-700');
       spinner.classList.remove('hidden');
 
       const result = await SuggestionGenerator.generate(text);
@@ -61,45 +59,18 @@ document.addEventListener('DOMContentLoaded', async () => {
 
       // Update badge based on score
       await updateBadge(result.score.level.toLowerCase() as RiskScore);
-
+      console.log(result);
       // Generate HTML for the analysis
       const analysisHtml = `
         <div class="mb-4">
           <div class="flex items-center gap-2 mb-2">
             <span class="font-semibold">Risk Level:</span>
-            <span class="px-2 py-1 rounded text-sm text-white bg-${result.score.level.toLowerCase()}-500">
+            <span class="p-1 rounded text-sm text-white bg-${result.score.level.toLowerCase()}-500">
               ${result.score.level}
             </span>
           </div>
           <p class="text-gray-600 text-sm">${result.score.description}</p>
         </div>
-        
-        ${
-          result.analysis.hasSensitiveData
-            ? `
-          <div class="mt-4">
-            <h4 class="font-semibold mb-2">Detected Sensitive Data:</h4>
-            <ul class="list-disc pl-4">
-              ${result.analysis.highlightedData
-                .map(
-                  (item) => `
-                <li class="mb-1">
-                  <span class="font-medium">${item.category}:</span>
-                  <span class="text-red-600">${item.data}</span>
-                </li>
-              `
-                )
-                .join('')}
-            </ul>
-          </div>
-        `
-            : `
-          <div class="mt-4 p-3 bg-green-50 text-green-800 rounded">
-            No sensitive data detected in the provided text.
-          </div>
-        `
-        }
-        
         <div class="mt-4">
           <h4 class="font-semibold mb-2">Full Analysis:</h4>
           ${marked(result.analysis.rawText)}
@@ -119,8 +90,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     } finally {
       // Restore button to active state
       improveBtn.disabled = false;
-      improveBtn.classList.remove('bg-gray-300', 'cursor-not-allowed');
-      improveBtn.classList.add('bg-emerald-600', 'hover:bg-emerald-700');
       spinner.classList.add('hidden');
     }
   }
@@ -128,6 +97,7 @@ document.addEventListener('DOMContentLoaded', async () => {
   async function updateBadge(riskScore: RiskScore) {
     // Get color based on risk score
     const badgeColors: BadgeColors = {
+      black: '#000000', // Black for highest risk
       red: '#ef4444', // Tailwind red-500
       yellow: '#eab308', // Tailwind yellow-500
       green: '#22c55e', // Tailwind green-500
@@ -138,7 +108,7 @@ document.addEventListener('DOMContentLoaded', async () => {
       type: 'UPDATE_BADGE',
       payload: {
         color: badgeColors[riskScore],
-        text: riskScore[0].toUpperCase(), // First letter: R, Y, or G
+        text: '', // Remove the initial from the badge
       },
     } as UpdateBadgeMessage);
   }

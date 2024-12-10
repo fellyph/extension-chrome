@@ -13,21 +13,15 @@ export class SuggestionGenerator {
         throw new Error('Failed to get analysis or score');
       }
 
-      // Extract highlighted data items
-      const highlightedDataRegex = /\*\s*([^:]+):\s*([^\n]+)/g;
-      const highlightedData = [...analysisText.matchAll(highlightedDataRegex)].map((match) => ({
-        category: match[1].trim(),
-        data: match[2].trim(),
-      }));
-
       return {
         analysis: {
-          highlightedData,
           rawText: analysisText,
         },
         score: {
-          level: scoreText.trim() as 'Green' | 'Yellow' | 'Red',
-          description: this.getScoreDescription(scoreText.trim() as 'Green' | 'Yellow' | 'Red'),
+          level: scoreText.trim() as 'Green' | 'Yellow' | 'Red' | 'Black',
+          description: this.getScoreDescription(
+            scoreText.trim() as 'Green' | 'Yellow' | 'Red' | 'Black'
+          ),
         },
       };
     } catch (error) {
@@ -36,11 +30,12 @@ export class SuggestionGenerator {
     }
   }
 
-  private static getScoreDescription(level: 'Green' | 'Yellow' | 'Red'): string {
+  private static getScoreDescription(level: 'Green' | 'Yellow' | 'Red' | 'Black'): string {
     const descriptions = {
       Green: 'No sensitive data detected',
       Yellow: 'Potentially sensitive data detected',
       Red: 'Sensitive data detected',
+      Black: 'Highly sensitive data detected - requires immediate attention',
     };
     return descriptions[level];
   }

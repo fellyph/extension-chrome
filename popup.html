@@ -24,14 +24,13 @@
         ></textarea>
         <button
           id="improveBtn"
-          class="rounded bg-emerald-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-emerald-700"
+          class="rounded bg-emerald-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-300"
         >
           Analyze Text
         </button>
         <div id="spinner" class="hidden">Loading...</div>
       </div>
       <div id="analysisSection" class="mt-2.5 hidden">
-        <h3>Analysis:</h3>
         <div id="suggestionsList" class="markdown-content prose prose-sm max-w-none"></div>
       </div>
     </div>
