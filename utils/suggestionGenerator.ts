@@ -1,5 +1,5 @@
 import { TextAnalyzer } from './textAnalyzer.js';
-import type { AnalysisResult } from '../types/AnalysisResult.js';
+import type { AnalysisResult } from '../../types/AnalysisResult.js';
 
 export class SuggestionGenerator {
   static async generate(text: string): Promise<AnalysisResult | null> {

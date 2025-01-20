@@ -3,6 +3,7 @@
     "target": "esnext",
     "module": "esnext",
     "moduleResolution": "node",
+    "jsx": "react-jsx",
     "strict": true,
     "esModuleInterop": true,
     "skipLibCheck": true,
@@ -10,10 +11,10 @@
     "outDir": "./dist",
     "baseUrl": "./",
     "paths": {
-      "*": ["node_modules/*"]
+      "*": ["node_modules/*", "src/*"]
     },
-    "types": ["chrome"]
+    "types": ["chrome", "react", "react-dom"]
   },
-  "include": ["src/**/*"],
+  "include": ["src/**/*", "src/utils/**/*", "src/types/**/*"],
   "exclude": ["node_modules", "dist"]
 }

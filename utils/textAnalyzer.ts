@@ -1,71 +1,51 @@
-// Define interfaces for better type safety
+import React, { useState, useEffect } from 'react';
+import { marked } from 'marked';
+import type { AnalysisResult } from '../../types/AnalysisResult';
+import type { BadgeColors } from '../../types/BadgeColors';
+import { SuggestionGenerator } from './suggestionGenerator';
+
+type RiskScore = 'red' | 'yellow' | 'green' | 'black';
+
 interface AICapabilities {
   available: boolean | 'no';
   defaultTopK: number;
-}
-
-interface DownloadProgressEvent extends Event {
-  loaded: number;
-  total: number;
 }
 
 interface AISession {
   prompt: (text: string) => Promise<string>;
 }
 
-interface ChromeAI {
-  aiOriginTrial: {
-    languageModel: {
-      capabilities: () => Promise<AICapabilities>;
-      create: (options: AISessionOptions) => Promise<AISession>;
-    };
-  };
-}
-
 interface AISessionOptions {
   monitor?: (m: {
-    addEventListener: (event: string, callback: (e: DownloadProgressEvent) => void) => void;
+    addEventListener: (
+      event: string,
+      callback: (e: { loaded: number; total: number }) => void
+    ) => void;
   }) => void;
   systemPrompt?: string;
   temperature?: number;
   topK?: number;
 }
 
-// Extend the Window interface to include chrome
-declare global {
-  interface Window {
-    chrome: ChromeAI;
-  }
-}
-
 export class TextAnalyzer {
   static async createAISession(): Promise<AISession | null> {
     try {
-      // Check if AI capabilities are available
-      const capabilities = await chrome.aiOriginTrial.languageModel.capabilities();
+      const capabilities = await chrome.runtime.sendMessage({ type: 'GET_AI_CAPABILITIES' });
 
       if (!capabilities?.available) {
         console.warn('AI analysis not available');
         return null;
       }
 
-      if (capabilities.available === 'no') {
-        const session = await chrome.aiOriginTrial.languageModel.create({
-          monitor(m) {
-            m.addEventListener('downloadprogress', (e) => {
-              console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
-            });
-          },
-        });
-        return session;
-      }
-
-      // Create an AI session with appropriate system prompt
-      return await chrome.aiOriginTrial.languageModel.create({
-        systemPrompt: `You are a highly sensitive data detection AI. Your primary goal is to identify and categorize sensitive information with high accuracy and minimal false positives. Prioritize user privacy and data security. Always err on the side of caution when identifying potentially sensitive data, even if it means occasionally flagging something that is not truly sensitive.`,
-        temperature: 0.5,
-        topK: capabilities.defaultTopK,
-      });
+      return {
+        prompt: async (text: string) => {
+          const response = await chrome.runtime.sendMessage({
+            type: 'ANALYZE_TEXT',
+            payload: { text },
+          });
+          return response;
+        },
+      };
     } catch (error) {
       console.error('Error creating AI session:', error);
       return null;
@@ -75,10 +55,7 @@ export class TextAnalyzer {
   static async analyzeText(text: string): Promise<string | undefined> {
     try {
       const session = await this.createAISession();
-      if (!session) {
-        console.warn('AI analysis not available');
-        return undefined;
-      }
+      if (!session) return undefined;
 
       return await session.prompt(`Analyze the following text to determine if it contains sensitive information.
 
@@ -95,9 +72,9 @@ Sensitive information includes:
 3.  **Categorization:** Categorize each instance of highlighted data by its type (e.g., "credit card," "SSN," "email address," "full name," etc.). 
 
 Text:
- "${text}"`);
+"${text}"`);
     } catch (error) {
-      console.warn('AI analysis failed, falling back to basic checks:', error);
+      console.warn('AI analysis failed:', error);
       return undefined;
     }
   }
@@ -105,10 +82,7 @@ Text:
   static async scoreText(text: string): Promise<string | undefined> {
     try {
       const session = await this.createAISession();
-      if (!session) {
-        console.warn('AI analysis not available');
-        return undefined;
-      }
+      if (!session) return undefined;
 
       return await session.prompt(`Classify the following text based on its sensitivity level:
 
@@ -120,9 +94,9 @@ Text:
 Respond with only the color classification (Green, Yellow, Red, or Black).
 
 Text:
-  "${text}"`);
+"${text}"`);
     } catch (error) {
-      console.warn('AI analysis failed, falling back to basic checks:', error);
+      console.warn('AI analysis failed:', error);
       return undefined;
     }
   }

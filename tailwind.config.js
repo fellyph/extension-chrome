@@ -2,10 +2,9 @@
 export default {
   content: [
     './popup.html',
-    './popup.js',
-    './background.js',
-    './utils/**/*.{js,ts}',
-    './components/**/*.{js,ts}',
+    './src/**/*.{js,ts,jsx,tsx}',
+    './utils/**/*.{js,ts,jsx,tsx}',
+    './components/**/*.{js,ts,jsx,tsx}',
   ],
   theme: {
     extend: {},
