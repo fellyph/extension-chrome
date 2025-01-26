@@ -1,7 +1,7 @@
 import React from 'react';
 import { useTranslation } from 'react-i18next';
 import { RISK_LEVEL_STYLES } from '../constants/riskLevels';
-import type { RiskLevelProps, RiskLevelKey } from '../types/risk';
+import type { RiskLevelProps, RiskLevelKey } from '../types/Risk';
 
 export function RiskLevel({ score }: RiskLevelProps) {
   const { t } = useTranslation();
