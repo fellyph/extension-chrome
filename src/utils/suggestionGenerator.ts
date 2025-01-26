@@ -1,6 +1,6 @@
 import { TextAnalyzer } from './textAnalyzer';
 import type { AnalysisResult } from '../types/AnalysisResult';
-import { RISK_LEVEL_DESCRIPTIONS } from 'constants/riskLevels';
+import { RISK_LEVEL_DESCRIPTIONS } from '../constants/riskLevels';
 import { RiskLevel, RiskLevelKey } from '../types/Risk';
 
 export class SuggestionGenerator {
@@ -11,19 +11,25 @@ export class SuggestionGenerator {
         TextAnalyzer.scoreText(text),
       ]);
 
-      if (!analysisText || !scoreText) {
-        throw new Error('Failed to get analysis or score');
+      if (!analysisText) {
+        console.warn('Analysis text is undefined');
+        return null;
       }
+
+      if (!scoreText) {
+        console.warn('Score text is undefined');
+        return null;
+      }
+
+      const trimmedScore = scoreText.trim() as RiskLevel;
 
       return {
         analysis: {
           rawText: analysisText,
         },
         score: {
-          level: scoreText.trim() as 'Green' | 'Yellow' | 'Red' | 'Black',
-          description: this.getScoreDescription(
-            scoreText.trim() as 'Green' | 'Yellow' | 'Red' | 'Black'
-          ),
+          level: trimmedScore,
+          description: RISK_LEVEL_DESCRIPTIONS[trimmedScore.toUpperCase() as RiskLevelKey],
         },
       };
     } catch (error) {
