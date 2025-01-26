@@ -1,14 +1,12 @@
-import React, { useState, useEffect } from 'react';
-import { marked } from 'marked';
-import type { AnalysisResult } from '../types/AnalysisResult';
-import type { BadgeColors } from '../types/BadgeColors';
-import { SuggestionGenerator } from './suggestionGenerator';
-
-type RiskScore = 'red' | 'yellow' | 'green' | 'black';
-
+// Define interfaces for better type safety
 interface AICapabilities {
   available: boolean | 'no';
   defaultTopK: number;
+}
+
+interface DownloadProgressEvent extends Event {
+  loaded: number;
+  total: number;
 }
 
 interface AISession {
@@ -17,10 +15,7 @@ interface AISession {
 
 interface AISessionOptions {
   monitor?: (m: {
-    addEventListener: (
-      event: string,
-      callback: (e: { loaded: number; total: number }) => void
-    ) => void;
+    addEventListener: (event: string, callback: (e: DownloadProgressEvent) => void) => void;
   }) => void;
   systemPrompt?: string;
   temperature?: number;
@@ -55,7 +50,10 @@ export class TextAnalyzer {
   static async analyzeText(text: string): Promise<string | undefined> {
     try {
       const session = await this.createAISession();
-      if (!session) return undefined;
+      if (!session) {
+        console.warn('AI analysis not available');
+        return undefined;
+      }
 
       return await session.prompt(`Analyze the following text to determine if it contains sensitive information.
 
@@ -74,7 +72,7 @@ Sensitive information includes:
 Text:
 "${text}"`);
     } catch (error) {
-      console.warn('AI analysis failed:', error);
+      console.warn('AI analysis failed, falling back to basic checks:', error);
       return undefined;
     }
   }
@@ -82,7 +80,10 @@ Text:
   static async scoreText(text: string): Promise<string | undefined> {
     try {
       const session = await this.createAISession();
-      if (!session) return undefined;
+      if (!session) {
+        console.warn('AI analysis not available');
+        return undefined;
+      }
 
       return await session.prompt(`Classify the following text based on its sensitivity level:
 
@@ -96,7 +97,7 @@ Respond with only the color classification (Green, Yellow, Red, or Black).
 Text:
 "${text}"`);
     } catch (error) {
-      console.warn('AI analysis failed:', error);
+      console.warn('AI analysis failed, falling back to basic checks:', error);
       return undefined;
     }
   }

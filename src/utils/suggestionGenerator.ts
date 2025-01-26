@@ -1,5 +1,7 @@
-import { TextAnalyzer } from './textAnalyzer.js';
-import type { AnalysisResult } from '../types/AnalysisResult.js';
+import { TextAnalyzer } from './textAnalyzer';
+import type { AnalysisResult } from '../types/AnalysisResult';
+import { RISK_LEVEL_DESCRIPTIONS } from 'constants/riskLevels';
+import { RiskLevel, RiskLevelKey } from '../types/Risk';
 
 export class SuggestionGenerator {
   static async generate(text: string): Promise<AnalysisResult | null> {
@@ -30,13 +32,7 @@ export class SuggestionGenerator {
     }
   }
 
-  private static getScoreDescription(level: 'Green' | 'Yellow' | 'Red' | 'Black'): string {
-    const descriptions = {
-      Green: 'No sensitive data detected',
-      Yellow: 'Potentially sensitive data detected',
-      Red: 'Sensitive data detected',
-      Black: 'Highly sensitive data detected - requires immediate attention',
-    };
-    return descriptions[level];
+  private static getScoreDescription(level: RiskLevel): string {
+    return RISK_LEVEL_DESCRIPTIONS[level.toUpperCase() as RiskLevelKey];
   }
 }
