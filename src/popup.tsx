@@ -9,6 +9,7 @@ import type { AnalysisResult } from './types/AnalysisResult';
 import type { BadgeColors } from './types/BadgeColors';
 import './i18n';
 import './style.css';
+import { TextAnalyzer } from './utils/textAnalyzer';
 
 type RiskScore = 'red' | 'yellow' | 'green' | 'black';
 
@@ -30,6 +31,13 @@ const Popup: React.FC = () => {
     };
 
     checkSelectedText();
+  }, []);
+
+  useEffect(() => {
+    return () => {
+      // Cleanup when popup closes
+      TextAnalyzer.destroySession();
+    };
   }, []);
 
   const handleClose = () => {

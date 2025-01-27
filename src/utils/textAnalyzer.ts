@@ -1,36 +1,53 @@
-import type { AISession } from '../types/ChromeAi';
 import { AI_PROMPTS } from '../constants/aiPrompts';
 
 export class TextAnalyzer {
-  static async createAISession(): Promise<AISession | null> {
-    try {
-      const capabilities = await chrome.runtime.sendMessage({ type: 'GET_AI_CAPABILITIES' });
+  private static session: AILanguageModelSession | null = null;
+  private static isInitializing = false;
 
-      if (!capabilities?.available) {
+  private static async initializeSession(): Promise<AILanguageModelSession | null> {
+    if (this.isInitializing) return null;
+
+    try {
+      this.isInitializing = true;
+      const capabilities = await chrome.aiOriginTrial.languageModel.capabilities();
+
+      if (capabilities.available === 'no') {
         console.error('AI capabilities not available:', capabilities);
         return null;
       }
 
-      return {
-        prompt: async (text: string) => {
-          const response = await chrome.runtime.sendMessage({
-            type: 'ANALYZE_TEXT',
-            payload: { text },
-          });
+      if (capabilities.available === 'after-download') {
+        console.log('Model needs to be downloaded first...');
+      }
 
-          if (!response) throw new Error('No response received from AI analysis');
-          return response;
+      this.session = await chrome.aiOriginTrial.languageModel.create({
+        systemPrompt: 'You are a helpful assistant that analyzes text.',
+        monitor(m) {
+          m.addEventListener('downloadprogress', (e) => {
+            console.log(`Downloaded ${e.loaded} of ${e.total} bytes.`);
+          });
         },
-      };
+      });
+
+      return this.session;
     } catch (error) {
       console.error('Error creating AI session:', error);
       return null;
+    } finally {
+      this.isInitializing = false;
     }
+  }
+
+  private static async getSession(): Promise<AILanguageModelSession | null> {
+    if (!this.session) {
+      return await this.initializeSession();
+    }
+    return this.session;
   }
 
   static async analyzeText(text: string): Promise<string | undefined> {
     try {
-      const session = await this.createAISession();
+      const session = await this.getSession();
       if (!session) {
         console.warn('AI analysis not available');
         return undefined;
@@ -45,7 +62,7 @@ export class TextAnalyzer {
 
   static async scoreText(text: string): Promise<string | undefined> {
     try {
-      const session = await this.createAISession();
+      const session = await this.getSession();
       if (!session) {
         console.warn('AI analysis not available');
         return undefined;
@@ -55,6 +72,13 @@ export class TextAnalyzer {
     } catch (error) {
       console.warn('AI analysis failed:', error);
       return undefined;
+    }
+  }
+
+  static destroySession(): void {
+    if (this.session) {
+      this.session.destroy();
+      this.session = null;
     }
   }
 }
