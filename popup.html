@@ -2,38 +2,11 @@
 <html>
   <head>
     <title>Sensitive Data Analyzer</title>
-    <link rel="stylesheet" href="./style.css" />
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   </head>
-  <body class="relative w-[400px] p-4 font-sans">
-    <div class="flex flex-col gap-4">
-      <header class="app-header -m-4 mb-4 flex items-center gap-3 bg-emerald-600 p-4 text-white">
-        <img src="icons/icon48.png" alt="Logo" class="h-4 w-4" />
-        <h2 class="text-base font-semibold">Sensitive Data Analyzer</h2>
-        <button
-          id="closeBtn"
-          class="absolute right-3 top-3 flex h-6 w-6 items-center justify-center rounded-full bg-white text-sm font-medium text-emerald-600 transition-colors duration-200 hover:bg-emerald-50"
-        >
-          ✕
-        </button>
-      </header>
-      <div class="flex flex-col gap-2.5">
-        <textarea
-          id="textInput"
-          placeholder="Enter your text here..."
-          class="h-[100px] w-full resize-y rounded border border-gray-300 p-2"
-        ></textarea>
-        <button
-          id="improveBtn"
-          class="rounded bg-emerald-600 px-4 py-2 text-white transition-colors duration-200 hover:bg-emerald-700 disabled:cursor-not-allowed disabled:bg-gray-300"
-        >
-          Analyze Text
-        </button>
-        <div id="spinner" class="hidden">Loading...</div>
-      </div>
-      <div id="analysisSection" class="mt-2.5 hidden">
-        <div id="suggestionsList" class="markdown-content prose prose-sm max-w-none"></div>
-      </div>
-    </div>
-    <script type="module" src="./popup.ts"></script>
+  <body>
+    <div id="root"></div>
+    <script type="module" src="/src/popup.tsx"></script>
   </body>
 </html>

@@ -1,5 +1,6 @@
 import type { UpdateBadgeMessage } from './types/UpdateBadgeMessage';
 import type { StorageData } from './types/StorageData';
+import type { BackgroundMessage } from './types/BackgroundMessage';
 
 // Type guard for message type
 function isUpdateBadgeMessage(message: any): message is UpdateBadgeMessage {
@@ -56,11 +57,24 @@ chrome.contextMenus.onClicked.addListener(async (info, tab) => {
 // Handle messages from popup
 chrome.runtime.onMessage.addListener(
   (
-    message: unknown,
+    message: BackgroundMessage | UpdateBadgeMessage,
     sender: chrome.runtime.MessageSender,
     sendResponse: (response?: any) => void
   ) => {
     console.log('Message received:', message);
+
+    if (message?.type === 'GET_AI_CAPABILITIES') {
+      // Check if AI capabilities are available
+      sendResponse({ available: true, defaultTopK: 1 });
+      return true; // Keep the message channel open for async response
+    }
+
+    if (message?.type === 'ANALYZE_TEXT') {
+      // Handle text analysis
+      // For now, return a mock response
+      sendResponse('Green');
+      return true;
+    }
 
     if (isUpdateBadgeMessage(message)) {
       const { color, text } = message.payload;
